@@ -11,30 +11,31 @@ const PORT = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Function to update the db file. Takes one parameter, update,
+// which is a function that takes the saved notes as a parameter and returns
+// the updated notes to save
+function updateDb(update) {
+    fs.readFile(dbPath, "utf8", (err, data) => {
+        if (err) { console.error(err); }
+        fs.writeFile(dbPath, JSON.stringify(update(JSON.parse(data))), err => {
+            if (err) { console.error(err); }
+        });
+    });
+}
+
 // Set up API routes
 app.get("/api/notes", (req, res) => res.sendFile(dbPath));
-app.post("/api/notes", (req, res) => fs.readFile(dbPath, "utf8", (err, data) => {
-    if (err) { console.error(err); }
-    const notes = JSON.parse(data);
+app.post("/api/notes", (req, res) => updateDb(notes => {
     const ids = notes.map(note => parseInt(note.id));
     let newId = 1;
     for (; ids.includes(newId); newId++);
     const newNote = { ...req.body, id: newId };
-    notes.push(newNote);
-    fs.writeFile(dbPath, JSON.stringify(notes), err => {
-        if (err) { console.error(err); }
-    });
     res.json(newNote);
+    notes.push(newNote);
+    return notes;
 }));
 app.delete("/api/notes/:id", (req, res) => {
-    fs.readFile(dbPath, "utf8", (err, data) => {
-        if (err) { console.error(err); }
-        const notes = JSON.parse(data);
-        const remainingNotes = notes.filter(note => note.id != req.params.id);
-        fs.writeFile(dbPath, JSON.stringify(remainingNotes), err => {
-            if (err) { console.error(err); }
-        });
-    });
+    updateDb(notes => notes.filter(note => note.id != req.params.id));
     res.end();
 });
 
