@@ -13,21 +13,19 @@ app.use(express.json());
 
 // Set up API routes
 app.get("/api/notes", (req, res) => res.sendFile(dbPath));
-app.post("/api/notes", (req, res) => {
-    fs.readFile(dbPath, "utf8", (err, data) => {
+app.post("/api/notes", (req, res) => fs.readFile(dbPath, "utf8", (err, data) => {
+    if (err) { console.error(err); }
+    const notes = JSON.parse(data);
+    const ids = notes.map(note => parseInt(note.id));
+    let newId = 0;
+    for (; ids.includes(newId); newId++);
+    const newNote = { ...req.data, id: newId };
+    notes.push(newNote);
+    fs.writeFile(dbPath, JSON.stringify(notes), err => {
         if (err) { console.error(err); }
-        const notes = JSON.parse(data);
-        const ids = notes.map(note => parseInt(note.id));
-        let newId = 0;
-        for (; ids.includes(newId); newId++);
-        const newNote = { ...req.data, id: newId };
-        notes.push(newNote);
-        fs.writeFile(dbPath, JSON.stringify(notes), err => {
-            if (err) { console.error(err); }
-        });
     });
-    res.end();
-});
+    res.json(newNote);
+}));
 
 // Set up HTML GET routes
 app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
