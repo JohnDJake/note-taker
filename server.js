@@ -27,7 +27,7 @@ function updateDb(res, update) {
 function send500(err, res) {
     if (err) {
         console.error(err);
-        if (!res.headersSent) { res.writeHead(500); }
+        if (!res.headersSent) { res.sendStatus(500); }
         res.end();
         return false;
     }
