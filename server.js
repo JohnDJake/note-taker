@@ -26,6 +26,17 @@ app.post("/api/notes", (req, res) => fs.readFile(dbPath, "utf8", (err, data) => 
     });
     res.json(newNote);
 }));
+app.delete("/api/notes/:id", (req, res) => {
+    fs.readFile(dbPath, "utf8", (err, data) => {
+        if (err) { console.error(err); }
+        const notes = JSON.parse(data);
+        const remainingNotes = notes.filter(note => note.id != req.params.id);
+        fs.writeFile(dbPath, JSON.stringify(remainingNotes), err => {
+            if (err) { console.error(err); }
+        });
+    });
+    res.end();
+});
 
 // Set up HTML GET routes
 app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
