@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Set up API routes
+app.get("/api/notes", (req, res) => res.sendFile(path.join(__dirname, "db/db.json")));
+
 // Set up HTML GET routes
 app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
 app.get("/assets/*", (req, res) => res.sendFile(path.join(__dirname, "public/assets", req.params["0"])));
