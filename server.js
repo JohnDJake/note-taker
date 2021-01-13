@@ -20,6 +20,8 @@ app.post("/api/notes", (req, res) => {
         const ids = notes.map(note => parseInt(note.id));
         let newId = 0;
         for (; ids.includes(newId); newId++);
+        const newNote = { ...req.data, id: newId };
+        notes.push(newNote);
     });
     res.end();
 });
