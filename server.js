@@ -13,6 +13,13 @@ app.use(express.json());
 
 // Set up API routes
 app.get("/api/notes", (req, res) => res.sendFile(dbPath));
+app.post("/api/notes", (req, res) => {
+    fs.readFile(dbPath, "utf8", (err, data) => {
+        if (err) { console.error(err); }
+        const notes = JSON.parse(data);
+    });
+    res.end();
+});
 
 // Set up HTML GET routes
 app.get("/notes", (req, res) => res.sendFile(path.join(__dirname, "public/notes.html")));
