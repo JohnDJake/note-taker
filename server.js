@@ -22,6 +22,9 @@ app.post("/api/notes", (req, res) => {
         for (; ids.includes(newId); newId++);
         const newNote = { ...req.data, id: newId };
         notes.push(newNote);
+        fs.writeFile(dbPath, JSON.stringify(notes), err => {
+            if (err) { console.error(err); }
+        });
     });
     res.end();
 });
