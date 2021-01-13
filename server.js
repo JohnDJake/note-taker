@@ -19,7 +19,7 @@ app.post("/api/notes", (req, res) => fs.readFile(dbPath, "utf8", (err, data) => 
     const ids = notes.map(note => parseInt(note.id));
     let newId = 0;
     for (; ids.includes(newId); newId++);
-    const newNote = { ...req.data, id: newId };
+    const newNote = { ...req.body, id: newId };
     notes.push(newNote);
     fs.writeFile(dbPath, JSON.stringify(notes), err => {
         if (err) { console.error(err); }
