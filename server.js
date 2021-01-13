@@ -17,6 +17,9 @@ app.post("/api/notes", (req, res) => {
     fs.readFile(dbPath, "utf8", (err, data) => {
         if (err) { console.error(err); }
         const notes = JSON.parse(data);
+        const ids = notes.map(note => parseInt(note.id));
+        let newId = 0;
+        for (; ids.includes(newId); newId++);
     });
     res.end();
 });
