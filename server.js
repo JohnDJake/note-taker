@@ -14,18 +14,29 @@ app.use(express.json());
 // Function to update the db file. Takes one parameter, update,
 // which is a function that takes the saved notes as a parameter and returns
 // the updated notes to save
-function updateDb(update) {
+function updateDb(res, update) {
     fs.readFile(dbPath, "utf8", (err, data) => {
-        if (err) { console.error(err); }
-        fs.writeFile(dbPath, JSON.stringify(update(JSON.parse(data))), err => {
-            if (err) { console.error(err); }
-        });
+        if (send500(err, res)) {
+            fs.writeFile(dbPath, JSON.stringify(update(JSON.parse(data))), err => send500(err, res));
+        }
     });
 }
 
+// Checks if there is an error and handles it. Responds with 500 if there is an error
+// Returns true if there is no error and false if there is
+function send500(err, res) {
+    if (err) {
+        console.error(err);
+        if (!res.headersSent) { res.writeHead(500); }
+        res.end();
+        return false;
+    }
+    return true;
+}
+
 // Set up API routes
-app.get("/api/notes", (req, res) => res.sendFile(dbPath));
-app.post("/api/notes", (req, res) => updateDb(notes => {
+app.get("/api/notes", (req, res) => res.sendFile(dbPath, err => send500(err, res)));
+app.post("/api/notes", (req, res) => updateDb(res, notes => {
     const ids = notes.map(note => parseInt(note.id));
     let newId = 1;
     for (; ids.includes(newId); newId++);
@@ -35,7 +46,7 @@ app.post("/api/notes", (req, res) => updateDb(notes => {
     return notes;
 }));
 app.delete("/api/notes/:id", (req, res) => {
-    updateDb(notes => notes.filter(note => note.id != req.params.id));
+    updateDb(res, notes => notes.filter(note => note.id != req.params.id));
     res.end();
 });
 
