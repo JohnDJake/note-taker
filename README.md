@@ -32,6 +32,9 @@ You can use my live version of the app by clicking the deployed link above.
 
 To run it yourself, follow my installation instructions and then run `node server.js`.
 
+![Home page screenshot](assets/images/home.png)
+![Notes page screenshot](assets/images/notes.png)
+
 
 
 ## Contributing
